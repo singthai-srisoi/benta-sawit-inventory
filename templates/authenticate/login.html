@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}login{% endblock title %}
+{% block content %}
+<div class="center-div">
+<div class="content">
+<h1>Login</h1>
+
+
+<form method="POST" action="{% url 'login' %}"> 
+{% csrf_token %}
+    <table>
+        <tr>
+            <th>
+                <label>Username</label>
+            </th>
+            <td>
+                <input type="text" name="username" />
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <label>Password</label>
+            </th>
+            <td>
+                <input type="password" name="password" />
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button id="Submit" style="width: 75px">login</button>
+            </td>
+        </tr>
+    </table>
+</form>
+</div>
+</div>
+{% endblock content %}
+{% block script %}
+let button = document.querySelector('#Submit')
+let animationInstance = null;
+let animationRunning = false;
+
+button.addEventListener('click', function (event) {
+    if (animationRunning) {
+        animationInstance.stopAnimation();
+        button.innerHTML = "login"
+        animationRunning = false;
+    } else {
+        animationInstance = new ASCIIAnimation(button_loading, 50, button);
+        animationRunning = true;        
+    }
+});
+{% endblock script %}

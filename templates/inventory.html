@@ -1,0 +1,817 @@
+{% extends 'base.html' %}
+{% block title %}Inventory{% endblock title %}
+{% block content %}
+{% include 'shared/_topnav.html' %}
+<div class="parent"> 
+{% include 'shared/_navbar.html' %}
+<div class="div2">
+    <h1>Inventory</h1>
+    <div>
+        <form id="inventory-form">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>
+                        <label for="ticket_no">Ticket No</label>
+                    </td>
+                    <td>
+                        <input type="text" name="ticket_no" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="date">Date</label>
+                    </td>
+                    <td>
+                        <input type="date" name="date" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="vehicle">Vehicle</label>
+                    </td>
+                    <td>
+                        <input type="text" name="vehicle" />
+                        <select name="vehicles">
+                            <option value=""></option>
+                            {% for vehicle in vehicles %}
+                                <option value="{{ vehicle.reg_no }}">{{ vehicle }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="driver">Driver</label>
+                    </td>
+                    <td>
+                        <input type="text" name="driver" />
+                        <select name="drivers">
+                            <option value=""></option>
+                            {% for person in drivers %}
+                                <option value="{{ person.code }}">{{ person.code }} {{ person.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="supplier">From Supplier</label>
+                    </td>
+                    <td>
+                        <input type="text" name="supplier" />
+                        <select name="suppliers">
+                            <option value=""></option>
+                            {% for person in suppliers %}
+                                <option value="{{ person.code }}">{{ person.code }} {{ person.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% comment %} # new added fields
+    # customer_ticket_no, factory_nett, bucket
+    # factory_nett = weight_in - weight_out
+    # bucket = deduction / 20 {% endcomment %}
+                <tr>
+                    <td>
+                        <label for="customer_ticket_no">Customer Ticket No</label>
+                    </td>
+                    <td>
+                        <input type="text" name="customer_ticket_no" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="supplier">Supplier Quantity</label>
+                    </td>
+                    <td>
+                        <input type="number" name="supplier_quantity" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="customer">To Customer</label>
+                    </td>
+                    <td>
+                        <input type="text" name="customer" />
+                        <select name="customers">
+                            <option value=""></option>
+                            {% for person in customers %}
+                                <option value="{{ person.code }}">{{ person.code }} {{ person.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <!--
+                <tr>
+                    <td>
+                        <label for="to_destination">Destination</label>
+                    </td>
+                    <td>
+                        <input type="text" name="destination" />
+                        <select name="destinations">
+                            <option value=""></option>
+                            {% for destination in destinations %}
+                                <option value="{{ destination.code }}">{{ destination.code }} {{ destination.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                -->
+                <tr>
+                    <td>
+                        <label for="product">Product</label>
+                    </td>
+                    
+                    <td>
+                        <input type="text" name="product" />
+                        <select name="products">
+                            <option value=""></option>
+                            {% for product in products %}
+                                <option value="{{ product.code }}">{{ product.code }} {{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                
+                
+                
+                
+                <tr>
+                    <td>
+                        <label for="_do">D.O</label>
+                    </td>
+                    <td>
+                        <input type="text" name="_do" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="weight_in">Weight In</label>
+                    </td>
+                    <td>
+                        <input type="number" name="weight_in" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="weight_out">Weight Out</label>
+                    </td>
+                    <td>
+                        <input type="number" name="weight_out" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="factory_nett">Factory Nett</label>
+                    </td>
+                    <td>
+                        <input type="number" name="factory_nett" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="deduction">Deduction</label>
+                    </td>
+                    <td>
+                        <input type="number" name="deduction" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="nett">Nett weight</label>
+                    </td>
+                    <td>
+                        <input type="number" name="nett" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="bucket">Bucket</label>
+                    </td>
+                    <td>
+                        <input type="number" name="bucket" step="0.01" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="remark">Remark</label>
+                    </td>
+                    <td>
+                        <input type="text" name="remark" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="submit" id="button" value="Add" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div>
+        <form action="{% url 'inventories' %}" id="date-filter" method="POST">
+            {% csrf_token %}
+            <hr />
+            <label>
+                Start Date: <input type="date" name="start_date" value="{{ start_date }}"/>
+            </label>
+            <label>
+                End Date: <input type="date" name="end_date" value="{{ end_date }}"/>
+            </label>
+            <input type="submit" value="Apply" />
+            <hr />
+        </form>
+    </div>
+    <table class="datatable">
+        <colgroup>
+            
+        </colgroup>
+        <thead>
+            <tr>
+                <td hidden>id</td>
+                <td>Ticket No</td>
+                <td>Date</td>
+                <td>Vehicle</td>
+                <td>Driver</td>
+                <td>Supplier</td>
+                <td>Customer Ticket No.</td>
+                <td>Supplier Quantity</td>
+                <td>Customer</td>
+                <td>Product</td>
+                <td>D.O</td>
+                <td>Weight In</td>
+                <td>Weight Out</td>
+                <td>Factory Nett</td>
+                <td>Deduction</td>
+                <td>Nett Weight</td>
+                <td>Bucket</td>
+                <td>Remark</td>
+            </tr>
+        </thead>
+        {% load post_tag %}
+        <tbody>
+            {% for inventory in inventories %}
+                <tr>
+                    <td hidden>{{ inventory.id }}</td>
+                    <td>{{ inventory.ticket_no }}</td>
+                    <td>{{ inventory.date }}</td>
+                    <td>{{ inventory.vehicle.reg_no }}</td>
+                    <td>{{ inventory.driver.code }}</td>
+                    <td>{{ inventory.supplier.code }}</td>
+                    <td>{{ inventory.customer_ticket_no }}</td>
+                    <td>{{ inventory.supplier_qty }}</td>
+                    <td>{{ inventory.customer.code }}</td>
+                    <td>{{ inventory.product.code }}</td>
+                    <td>{{ inventory.do }}</td>
+                    <td>{{ inventory.weight_in }}</td>
+                    <td>{{ inventory.weight_out }}</td>
+                    <td>{{ inventory.factory_nett }}</td>
+                    <td>{{ inventory.deduction }}</td>
+                    <td>{% sub inventory.weight_in inventory.weight_out inventory.deduction %}</td>
+                    <td>{{ inventory.bucket }}</td>
+                    <td>
+                        {% if inventory.remark %}
+                            {{ inventory.remark }}
+                        {% else %}
+                            <!-- Display an empty cell when remark is empty -->
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+{% endblock %}
+
+{% block script %}
+let csrf_token = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+let form = document.querySelector("form");
+let button = document.querySelector("#button");
+let animationInstance = null;
+
+
+tbody.addEventListener("dblclick", function (event) {
+    var td = event.target;
+    var row = td.closest("tr");
+
+    if (td.tagName === "TD") {
+        makeRowEditable(row);
+        td.focus();
+        selectText(td);
+        
+        
+        // Remove 'selected-row' class from all other rowsa
+        var allRows = tbody.querySelectorAll("tr");
+        allRows.forEach(function (r) {
+            r.classList.remove("selected-row");
+        });
+
+        // Add 'selected-row' class to the clicked row
+        row.classList.add("selected-row");
+    }
+});
+
+
+tbody.addEventListener("keydown", function (event) {
+    //delete
+    if (event.keyCode === 46) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+
+        const obj = {};
+        [obj.id, 
+        obj.ticket_no,
+        obj.date,
+        obj.vehicle,
+        obj.driver,
+        obj.supplier,
+        obj.customer_ticket_no,
+        obj.supplier_quantity,
+        obj.destination,
+        obj.product,
+        obj.do,
+        obj.weight_in,
+        obj.weight_out,
+        obj.factory_nett,
+        obj.deduction,
+        obj.weight_nett,
+        obj.bucket,
+        obj.remark
+        ] = rowData;
+
+        console.table(obj.id);
+        //fetch delete_product
+        //confirm
+        if (!confirm("Are you sure you want to delete this product?")) {
+            return;
+        }
+        fetch("{% url 'delete_inventory' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'id': obj.id
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            row.remove();
+
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+    }
+
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+        
+
+{% comment %} 
+obj.id, 
+        obj.ticket_no,
+        obj.date,
+        obj.vehicle,
+        obj.driver,
+        obj.supplier,
+        obj.customer_ticket_no,
+        obj.supplier_quantity,
+        obj.destination,
+        obj.product,
+        obj.do,
+        obj.weight_in,
+        obj.weight_out,
+        obj.factory_nett,
+        obj.deduction,
+        obj.weight_nett,
+        obj.bucket,
+        obj.remark
+{% endcomment %}
+        const obj = {};
+        [obj.id, 
+        obj.ticket_no,
+        obj.date,
+        obj.vehicle,
+        obj.driver,
+        obj.supplier,
+        obj.customer_ticket_no,
+        obj.supplier_quantity,
+        obj.customer,
+        obj.product,
+        obj.do,
+        obj.weight_in,
+        obj.weight_out,
+        obj.factory_nett,
+        obj.deduction,
+        obj.weight_nett,
+        obj.bucket,
+        obj.remark
+        ] = rowData;
+
+        //check if weight_in, weight_out, deduction are numbers
+        if (isNaN(obj.weight_in) || isNaN(obj.weight_out) || isNaN(obj.deduction)) {
+            alert("Weight must be a number");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        
+
+        console.log(obj);
+        //check if the input is in the select list
+        if (!checkIfOptionExists(obj.vehicle, form.vehicles)) {
+            alert("Vehicle does not exist");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        if (!checkIfOptionExists(obj.customer, form.customers)) {
+            alert("Customer does not exist");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        if (!checkIfOptionExists(obj.driver, form.drivers)) {
+            alert("Driver does not exist");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        if (!checkIfOptionExists(obj.supplier, form.suppliers)) {
+            alert("Supplier does not exist");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        {% comment %} if (!checkIfOptionExists(obj.destination, form.destinations)) {
+            alert("Destination does not exist");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        } {% endcomment %}
+
+        if (!checkIfOptionExists(obj.product, form.products)) {
+            alert("Product does not exist");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        // check if weight_in, weight_out, deduction, suplpier_qty are numbers
+        if (isNaN(obj.weight_in) || isNaN(obj.weight_out) || isNaN(obj.deduction) || isNaN(obj.supplier_quantity)) {
+            alert("Weight must be a number");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        obj.id = parseInt(obj.id);
+
+        //console.table(obj);
+        //fetch edit_product
+        fetch("{% url 'edit_inventory' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'id': obj.id,
+                'ticket_no': obj.ticket_no,
+                'date': formatDate(obj.date),
+                'vehicle': obj.vehicle,
+                'driver': obj.driver,
+                'supplier': obj.supplier,
+                'customer_ticket_no': obj.customer_ticket_no,
+                'supplier_qty': obj.supplier_quantity,
+                'customer': obj.customer,
+                'product': obj.product,
+                'do': obj.do,
+                'weight_in': obj.weight_in,
+                'weight_out': obj.weight_out,
+                'factory_nett': obj.factory_nett,
+                'deduction': obj.deduction,
+                'bucket': obj.bucket,
+                'remarks': obj.remark
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            //weight nett td value 
+            row.querySelector("td:nth-child(14)").textContent = (parseFloat(obj.weight_in)||0) - (parseFloat(obj.weight_out)||0) - (parseFloat(obj.deduction)||0);
+            row.classList.remove("selected-row");
+            makeRowUnEditable(row);
+            form.reset();
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+
+       
+    }
+});
+
+
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    animationInstance = new ASCIIAnimation(button_loading, 50, button);
+
+    // Get the values from the form
+    let ticket_no = form.ticket_no.value;
+    let date = form.date.value;
+    let vehicle = form.vehicle.value;
+    let driver = form.driver.value;
+    let supplier = form.supplier.value;
+    let customer_ticket_no = form.customer_ticket_no.value;
+    let supplier_quantity = form.supplier_quantity.value||0;
+    let customer = form.customer.value;
+    let product = form.product.value;
+    let _do = form._do.value;
+    let weight_in = form.weight_in.value||0;
+    let weight_out = form.weight_out.value||0;
+    let factory_nett = form.factory_nett.value||0;
+    let deduction = form.deduction.value||0;
+    let bucket = form.bucket.value||0;
+    let remark = form.remark.value;
+
+    //if input is empty
+    if (ticket_no === "" 
+    || date === "" 
+    || vehicle === "" 
+    || driver === "" 
+    || supplier === "" 
+    || customer === "" 
+    || product === "" 
+    || _do === "" 
+    || weight_in === "" 
+    || weight_out === "" ) {
+        alert("Please fill in all the fields");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    //check if the input is in the select list
+    if (!checkIfOptionExists(vehicle, form.vehicles)) {
+        alert("Vehicle does not exist");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    if (!checkIfOptionExists(driver, form.drivers)) {
+        alert("Driver does not exist");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    if (!checkIfOptionExists(supplier, form.suppliers)) {
+        alert("Supplier does not exist");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    if (!checkIfOptionExists(customer, form.customers)) {
+        alert("Customer does not exist");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    if (!checkIfOptionExists(product, form.products)) {
+        alert("Product does not exist");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    //post using fetch api
+    fetch("{% url 'add_inventory' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf_token
+        },
+        body: JSON.stringify({
+            'ticket_no': ticket_no,
+            'date': date,
+            'vehicle': vehicle,
+            'driver': driver,
+            'supplier': supplier,
+            'customer_ticket_no': customer_ticket_no,
+            'supplier_qty': supplier_quantity,
+            'customer': customer,
+            'product': product,
+            '_do': _do,
+            'weight_in': weight_in,
+            'weight_out': weight_out,
+            'factory_nett': factory_nett,
+            'deduction': deduction,
+            'bucket': bucket,
+            'remarks': remark
+        })
+    }).then(function (response) {
+        if (!response.ok) {
+            return response.json().then(function (data) {
+                //alert(data.message); // Display the error message in an alert box
+                throw new Error("Record already exists");
+            });
+        }
+        return response.json();
+    }).then(function (data) {
+        // Create a new row
+        let row = document.createElement("tr");
+        //console.log(data.new_id);
+    
+        // Create the cells
+        let idCell = document.createElement("td"); 
+        let ticket_noCell = document.createElement("td"); 
+        let dateCell = document.createElement("td");
+        let vehicleCell = document.createElement("td");
+        let driverCell = document.createElement("td");
+        let supplierCell = document.createElement("td");
+        let customer_ticket_noCell = document.createElement("td");
+        let supplier_quantityCell = document.createElement("td");
+        let customerCell = document.createElement("td");
+        let productCell = document.createElement("td");
+        let _doCell = document.createElement("td");
+        let weight_inCell = document.createElement("td");
+        let weight_outCell = document.createElement("td");
+        let factory_nettCell = document.createElement("td");
+        let deductionCell = document.createElement("td");
+        let weight_nettCell = document.createElement("td");
+        let bucketCell = document.createElement("td");
+        let remarkCell = document.createElement("td");
+
+
+    
+        // Set the values of the cells
+        idCell.textContent = data.new_id;
+        ticket_noCell.textContent = ticket_no;
+        dateCell.textContent = date;
+        vehicleCell.textContent = vehicle;
+        driverCell.textContent = driver;
+        supplierCell.textContent = supplier;
+        customer_ticket_noCell.textContent = customer_ticket_no;
+        supplier_quantityCell.textContent = supplier_quantity;
+        customerCell.textContent = customer;
+        productCell.textContent = product;
+        _doCell.textContent = _do;
+        weight_inCell.textContent = weight_in;
+        weight_outCell.textContent = weight_out;
+        factory_nettCell.textContent = factory_nett;
+        deductionCell.textContent = deduction;
+        weight_nettCell.textContent = (parseFloat(weight_in)||0) - (parseFloat(weight_out)||0) - (parseFloat(deduction)||0);
+        bucketCell.textContent = bucket;
+        remarkCell.textContent = remark;
+
+        idCell.hidden = true;
+    
+        // Add the cells to the row
+        row.appendChild(idCell);
+        row.appendChild(ticket_noCell);
+        row.appendChild(dateCell);
+        row.appendChild(vehicleCell);
+        row.appendChild(driverCell);
+        row.appendChild(supplierCell);
+        row.appendChild(customer_ticket_noCell);
+        row.appendChild(supplier_quantityCell);
+        row.appendChild(customerCell);
+        row.appendChild(productCell);
+        row.appendChild(_doCell);
+        row.appendChild(weight_inCell);
+        row.appendChild(weight_outCell);
+        row.appendChild(factory_nettCell);
+        row.appendChild(deductionCell);
+        row.appendChild(weight_nettCell);
+        row.appendChild(bucketCell);
+        row.appendChild(remarkCell);
+
+        tbody.appendChild(row);
+
+        console.log(data);
+
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+
+        
+    }).catch(function (error) {
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        alert(error.message.toString());    
+    })
+
+    // Clear the form
+    form.reset();
+
+});
+
+
+let selectElements = document.querySelectorAll("select");
+selectElements.forEach(select => {
+    select.style.width = "100px";
+});
+
+form.addEventListener('input', function (e) {
+    form.nett.value = (parseFloat(form.weight_in.value)||0) - (parseFloat(form.weight_out.value)||0) - (parseFloat(form.deduction.value)||0);
+    form.factory_nett.value = (parseFloat(form.weight_in.value)||0) - (parseFloat(form.weight_out.value)||0);
+    form.bucket.value = (parseFloat(form.deduction.value)||0) / 20;
+})
+
+
+form.driver.addEventListener('input', function(e) {
+    Array.from(form.drivers.options).forEach(function(option) {
+        if (e.target.value === option.value) {
+            option.selected = true;
+        }
+    });
+});
+form.drivers.addEventListener('change', function(e) {
+    form.driver.value = e.target.value;
+});
+
+form.vehicle.addEventListener('input', function(e) {
+    Array.from(form.vehicles.options).forEach(function(option) {
+        if (e.target.value === option.value) {
+            option.selected = true;
+        }
+    });
+});
+form.vehicles.addEventListener('change', function(e) {
+    form.vehicle.value = e.target.value;
+});
+
+form.product.addEventListener('input', function(e) {
+    Array.from(form.products.options).forEach(function(option) {
+        if (e.target.value === option.value) {
+            option.selected = true;
+        }
+    });
+});
+form.products.addEventListener('change', function(e) {
+    form.product.value = e.target.value;
+});
+
+form.supplier.addEventListener('input', function(e) {
+    Array.from(form.suppliers.options).forEach(function(option) {
+        if (e.target.value === option.value) {
+            option.selected = true;
+        }
+    });
+});
+form.suppliers.addEventListener('change', function(e) {
+    form.supplier.value = e.target.value;
+});
+
+form.customer.addEventListener('input', function(e) {
+    Array.from(form.customers.options).forEach(function(option) {
+        if (e.target.value === option.value) {
+            option.selected = true;
+        }
+    });
+});
+form.customers.addEventListener('change', function(e) {
+    form.customer.value = e.target.value;
+});
+
+
+{% endblock %}

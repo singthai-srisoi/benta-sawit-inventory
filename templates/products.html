@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% block title %}Product{% endblock title %}
+{% block content %}
+{% include 'shared/_topnav.html' %}
+<div class="parent"> 
+{% include 'shared/_navbar.html' %}
+<div class="div2">
+    <h1>Products</h1>
+    <div>
+        <form>
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>
+                        <label for="code">Code</label>
+                    </td>
+                    <td>
+                        <input type="text" name="code" placeholder="Code" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="name">Name</label>
+                    </td>
+                    <td>
+                        <input type="text" name="name" placeholder="Name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="price">Price</label>
+                    </td>
+                    <td>
+                        <input type="number" name="price" placeholder="Price" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="type">Type</label>
+                    </td>
+                    <td>
+                        <input type="text" name="type" placeholder="Type" />
+                        <select name="types">
+                            <option value=""></option>
+                            {% for product_type in product_types %}
+                                <option value="{{ product_type.code }}">{{ product_type.code }} {{ product_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+
+                    <td>
+                        <button type="submit" id="button">Add</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div>
+        
+    </div>
+    <table class="datatable">
+        <colgroup>
+            <col style="width: 100px;">
+            <col style="width: 150px;">
+            <col style="width: 100px;">
+            <col style="width: 200px;">
+        </colgroup>
+        <thead>
+            <tr>
+                <td hidden>id</td>
+                <td>Code</td>
+                <td>Name</td>
+                <td>Price</td>
+                <td>Type</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products  %}
+                <tr>
+                    <td hidden>{{ product.id }}</td>
+                    <td>{{ product.code }}</td>
+                    <td>{{ product.name }}</td>
+                    <td data-type="numeric">{{ product.price }}</td>
+                    <td>{{ product.type.code }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+</div>
+
+
+
+{% endblock %}
+
+{% block script %}
+let csrf_token = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+
+let form = document.querySelector("form");
+let button = document.querySelector("#button");
+let animationInstance = null;
+const editProductUrl = "{% url 'edit_product' %}";
+tbody.addEventListener("dblclick", function (event) {
+    var td = event.target;
+    var row = td.closest("tr");
+
+    if (td.tagName === "TD") {
+        makeRowEditable(row);
+        td.focus();
+        selectText(td);
+        
+        
+        // Remove 'selected-row' class from all other rowsa
+        var allRows = tbody.querySelectorAll("tr");
+        allRows.forEach(function (r) {
+            r.classList.remove("selected-row");
+        });
+
+        // Add 'selected-row' class to the clicked row
+        row.classList.add("selected-row");
+    }
+});
+
+tbody.addEventListener("keydown", function (event) {
+    //delete
+    if (event.keyCode === 46) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+
+        const obj = {};
+        [obj.id, obj.code, obj.name, obj.price, obj.type] = rowData;
+
+        //console.table(obj);
+        //fetch delete_product
+        //confirm
+        if (!confirm("Are you sure you want to delete this product?")) {
+            return;
+        }
+        fetch("{% url 'delete_product' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'id': obj.id
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            row.remove();
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+    }
+
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+        
+
+
+        const obj = {};
+        [obj.id, obj.code, obj.name, obj.price, obj.type] = rowData;
+
+        if (isNaN(obj.price)) {
+            alert("Price must be a number");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        if (!checkIfOptionExists(obj.type, form.types)) {
+            alert("Product Type does not exist");
+            animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+            return;
+        }
+
+        // obj price to int
+        obj.price = parseInt(obj.price);
+        obj.id = parseInt(obj.id);
+
+        if (obj.type === "None") {
+            obj.type = "";
+        }
+
+        //console.table(obj);
+        //fetch edit_product
+        fetch(editProductUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'id': obj.id,
+                'code': obj.code,
+                'name': obj.name,
+                'price': obj.price,
+                'type': obj.type
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            row.classList.remove("selected-row");
+            makeRowUnEditable(row);
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+
+       
+    }
+});
+
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    animationInstance = new ASCIIAnimation(button_loading, 50, button);
+
+    // Get the values from the form
+    let code = form.code.value;
+    let name = form.name.value;
+    let price = form.price.value;
+    //get type from input element
+    let type = form.type.value;
+
+    console.table({code, name, price, type});
+
+    //if input is empty
+    if (code === "" || name === "" || price === "") {
+        alert("Please fill out all fields");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    //if input is not a number
+    if (isNaN(price)) {
+        alert("Price must be a number");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    if (!checkIfOptionExists(type, form.types)) {
+        alert("Product Type does not exist");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+
+    
+
+
+    //post using fetch api
+    fetch("{% url 'add_product' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf_token
+        },
+        body: JSON.stringify({
+            'code': code,
+            'name': name,
+            'price': price,
+            'type': type
+        })
+    }).then(function (response) {
+        if (!response.ok) {
+            return response.json().then(function (data) {
+                //alert(data.message); // Display the error message in an alert box
+                throw new Error("Product already exists");
+            });
+        }
+        return response.json();
+    }).then(function (data) {
+        // Create a new row
+        let row = document.createElement("tr");
+        //console.log(data.new_id);
+    
+        // Create the cells
+        let idCell = document.createElement("td"); 
+        let codeCell = document.createElement("td");
+        let nameCell = document.createElement("td");
+        let priceCell = document.createElement("td");
+        let typeCell = document.createElement("td");
+    
+        // Set the values of the cells
+        idCell.textContent = data.new_id;
+        codeCell.textContent = code;
+        nameCell.textContent = name;
+        priceCell.textContent = price;
+        if (type === "") {
+            type = "None";
+        }
+        typeCell.textContent = type;
+
+        idCell.hidden = true;
+    
+        // Add the cells to the row
+        row.appendChild(idCell);
+        row.appendChild(codeCell);
+        row.appendChild(nameCell);
+        row.appendChild(priceCell);
+        row.appendChild(typeCell);
+
+        tbody.appendChild(row);
+
+        console.log(data);
+
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+    }).catch(function (error) {
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        alert(error.message.toString());    
+    })
+
+    // Clear the form
+    form.reset();
+});
+
+//when the input[name="type"] edited, find the matching option in the select[name="type"] and select it
+
+
+form.type.addEventListener('input', function(e) {
+    Array.from(form.types.options).forEach(function(option) {
+        if (e.target.value === option.value) {
+            option.selected = true;
+        }
+    });
+});
+form.types.addEventListener('change', function(e) {
+    form.type.value = e.target.value;
+});
+
+{% endblock %}

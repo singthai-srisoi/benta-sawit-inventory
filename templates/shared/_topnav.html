@@ -1,0 +1,25 @@
+<div class="top-nav">
+    <div class="top-left-nav">
+        <a href="#" class="toggle-nav">
+            <div class="nav-title">
+                <h3>Company Name</h3>
+            </div>
+        </a>
+        
+
+        
+    </div>
+    <div class="top-right-nav">
+        <a href="/admin/auth/user/1/change/">
+            <div class="nav-item">
+                <b>{{ request.user.first_name }} {{ request.user.last_name }}</b>
+            </div>
+        </a>
+
+        <a href="{% url 'logout' %}">
+            <div class="nav-item">
+                Logout
+            </div>
+        </a>
+    </div>
+</div>

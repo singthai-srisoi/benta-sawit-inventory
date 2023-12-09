@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% block title %}Product Type{% endblock title %}
+{% block content %}
+{% include 'shared/_topnav.html' %}
+<div class="parent"> 
+{% include 'shared/_navbar.html' %}
+<div class="div2">
+    <h1>Product Types</h1>
+    <div>
+        <form>
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>
+                        <label for="code">Code</label>
+                    </td>
+                    <td>
+                        <input type="text" name="code" placeholder="Code" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="name">Name</label>
+                    </td>
+                    <td>
+                        <input type="text" name="name" placeholder="Name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+
+                    <td>
+                        <button type="submit" id="button">Add</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div>
+        
+    </div>
+    <table class="datatable">
+        <colgroup>
+            <col style="width: 100px;">
+            <col style="width: 150px;">
+            <col style="width: 100px;">
+            <col style="width: 200px;">
+        </colgroup>
+        <thead>
+            <tr>
+                <td>Code</td>
+                <td>Name</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product_type in product_types  %}
+                <tr>
+                    <td>{{ product_type.code }}</td>
+                    <td>{{ product_type.name }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+</div>
+
+
+
+{% endblock %}
+
+{% block script %}
+let csrf_token = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+const editProductUrl = "{% url 'edit_type' %}";
+let form = document.querySelector("form");
+let button = document.querySelector("#button");
+let animationInstance = null;
+
+tbody.addEventListener("dblclick", function (event) {
+    var td = event.target;
+    var row = td.closest("tr");
+
+    if (td.tagName === "TD") {
+        makeRowEditable(row);     
+        td.focus();
+        selectText(td);
+        
+        
+        // Remove 'selected-row' class from all other rowsa
+        var allRows = tbody.querySelectorAll("tr");
+        allRows.forEach(function (r) {
+            r.classList.remove("selected-row");
+        });
+
+        // Add 'selected-row' class to the clicked row
+        row.classList.add("selected-row");
+    }
+});
+
+tbody.addEventListener("keydown", function (event) {
+    //delete
+    if (event.keyCode === 46) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+
+        const obj = {};
+        [obj.code, obj.name] = rowData;
+
+        //console.table(obj)
+        if (!confirm("Are you sure you want to delete this product?")) {
+            return;
+        }
+        fetch("{% url 'delete_type' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'code': obj.code
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            row.remove();
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+    }
+
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+        
+
+
+        const obj = {};
+        [obj.code, obj.name] = rowData;
+        //console.table(obj)
+        fetch(editProductUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'code': obj.code,
+                'name': obj.name,
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            row.classList.remove("selected-row");
+            makeRowUnEditable(row);
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+
+       
+    }
+});
+
+
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    animationInstance = new ASCIIAnimation(button_loading, 50, button);
+
+    // Get the values from the form
+    let code = form.code.value;
+    let name = form.name.value;
+
+    //console.log(code, name, price, type);
+
+    //if input is empty
+    if (code === "" || name === "") {
+        alert("Please fill out all fields");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }  
+
+    //post using fetch api
+    fetch("{% url 'add_type' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf_token
+        },
+        body: JSON.stringify({
+            'code': code,
+            'name': name,
+        })
+    }).then(function (response) {
+        if (!response.ok) {
+            return response.json().then(function (data) {
+                //alert(data.message); // Display the error message in an alert box
+                throw new Error("Product already exists");
+            });
+        }
+        return response.json();
+    }).then(function (data) {
+        // Create a new row
+        let row = document.createElement("tr");
+        //console.log(data.new_id);
+    
+        // Create the cells
+
+        let codeCell = document.createElement("td");
+        let nameCell = document.createElement("td");
+    
+        // Set the values of the cells
+        
+        codeCell.textContent = code;
+        nameCell.textContent = name;
+
+        
+    
+        // Add the cells to the row
+
+        row.appendChild(codeCell);
+        row.appendChild(nameCell);
+
+        tbody.appendChild(row);
+
+        console.log(data);
+
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+    }).catch(function (error) {
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        alert(error.message.toString());    
+    })
+
+    // Clear the form
+    form.reset();
+});
+{% endblock %}

@@ -1,0 +1,1074 @@
+{% extends 'base.html' %}
+{% block title %}Report{% endblock title %}
+{% block content %}
+{% include 'shared/_topnav.html' %}
+<div class="parent"> 
+{% include 'shared/_navbar.html' %}
+<div class="div2">
+    <h1>Report</h1>
+    <div>
+        <form>
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <td>
+                        <label for="start_date">Start date</label>
+                        <input type="date" name="start_date"><span> - to  - </span>
+                        <label for="end_date">End date</label>
+                        <input type="date" name="end_date">
+                    </td>
+                    
+                    
+                </tr>
+                <tr>
+                    <th>Group by</th>
+                    <td>
+                        <input type="radio" id="product_" name="group_by" value="product">
+                        <label for="product_">product</label><br>
+
+                        <input type="radio" id="driver_" name="group_by" value="driver">
+                        <label for="driver_">driver</label><br>
+
+                        <input type="radio" id="ramp_" name="group_by" value="customer">
+                        <label for="ramp_">customer</label><br>
+
+                        <input type="radio" id="mill_" name="group_by" value="supplier">
+                        <label for="mill_">supplier</label><br>
+
+                        <input type="radio" id="vehicle_" name="group_by" value="vehicle">
+                        <label for="vehicle_">vehicle</label><br>
+                        
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Columns
+                    </th>
+                    <td class="column_filter">
+                        <details draggable>
+                            <summary>Column filter</summary>
+                            <div id="inputContainer" class="input-container">
+                                <label for="id">
+                                    <input type="checkbox" id="id" name="id" value="id" checked>
+                                    id
+                                </label>
+                                <label for="date">
+                                    <input type="checkbox" id="date" name="date" value="date" checked disabled>
+                                    date
+                                </label>
+                                <label for="vehicle__reg_no">
+                                    <input type="checkbox" id="vehicle__reg_no" name="vehicle__reg_no" value="vehicle__reg_no" checked>
+                                    vehicle
+                                </label>
+                                <label for="vehicle__model">
+                                    <input type="checkbox" id="vehicle__model" name="vehicle__model" value="vehicle__model" checked>
+                                    model
+                                </label>
+                                <label for="driver__code">
+                                    <input type="checkbox" id="driver__code" name="driver__code" value="driver__code" checked>
+                                    driver
+                                </label>
+                                <label for="driver__name">
+                                    <input type="checkbox" id="driver__name" name="driver__name" value="driver__name" checked>
+                                    driver name
+                                </label>
+                                <label for="supplier__code">
+                                    <input type="checkbox" id="supplier__code" name="supplier__code" value="supplier__code" checked>
+                                    supplier
+                                </label>
+                                <label for="supplier__name">
+                                    <input type="checkbox" id="supplier__name" name="supplier__name" value="supplier__name" checked>
+                                    supplier name
+                                </label>
+                                <label for="customer_ticket_no">
+                                    <input type="checkbox" id="customer_ticket_no" name="customer_ticket_no" value="customer_ticket_no" checked>
+                                    customer ticket no
+                                </label>
+                                <label for="supplier_qty">
+                                    <input type="checkbox" id="supplier_qty" name="supplier_qty" value="supplier_qty" checked>
+                                    supplier qty
+                                </label>
+                                <label for="customer__code">
+                                    <input type="checkbox" id="customer__code" name="customer__code" value="customer__code" checked>
+                                    customer
+                                </label>
+                                <label for="customer__name">
+                                    <input type="checkbox" id="customer__name" name="customer__name" value="customer__name" checked>
+                                    customer name
+                                </label>
+                                <label for="product__code">
+                                    <input type="checkbox" id="product__code__" name="product__code" value="product__code" checked>
+                                    product
+                                </label>
+                                <label for="product__name">
+                                    <input type="checkbox" id="product__name" name="product__name" value="product__name" checked>
+                                    product name
+                                </label>
+                                <label for="ticket_no">
+                                    <input type="checkbox" id="ticket_no" name="ticket_no" value="ticket_no" checked>
+                                    ticket no
+                                </label>
+                                <label for="do">
+                                    <input type="checkbox" id="do" name="do" value="do" checked>
+                                    D.O
+                                </label>
+                                <label for="remark">
+                                    <input type="checkbox" id="remark" name="remark" value="remark" checked>
+                                    remark
+                                </label>
+                                <label for="weight_in">
+                                    <input type="checkbox" id="weight_in" name="weight_in" value="weight_in" checked>
+                                    weight in
+                                </label>
+                                <label for="weight_out">
+                                    <input type="checkbox" id="weight_out" name="weight_out" value="weight_out" checked>
+                                    weight out
+                                </label>
+                                <label for="factory_nett">
+                                    <input type="checkbox" id="factory_nett" name="factory_nett" value="factory_nett" checked>
+                                    factory nett
+                                </label>
+                                <label for="deduction">
+                                    <input type="checkbox" id="deduction" name="deduction" value="deduction" checked>
+                                    deduction
+                                </label>
+                                <label for="weight_nett">
+                                    <input type="checkbox" id="weight_nett" name="weight_nett" value="weight_nett" checked>
+                                    weight nett
+                                </label>
+                                <label for="bucket">
+                                    <input type="checkbox" id="bucket" name="bucket" value="bucket" checked>
+                                    bucket
+                                </label>
+                                
+
+                            </div>
+                            
+                        </details>
+                        
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Filter
+                    </th>
+                    <td class="filter">
+                        <details>
+                            <summary>Product</summary>
+                            <div id="productContainer" class="product-container">
+                                <label for="product_all">
+                                    <input type="checkbox" id="product_all" name="product_all" value="product_all" checked>
+                                    Select All
+                                </label><br>
+                                {% for product in products %}
+                                <label for="{{ product.code }}">
+                                    <input type="checkbox" id="id" name="{{ product.code }}" value="{{ product.code }}" checked>
+                                    {{ product.code }} {{ product.name }}
+                                </label><br>
+                                {% endfor %}
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary>Customer</summary>
+                            <div id="customerContainer" class="customer-container">
+                                <label for="customer_all">
+                                    <input type="checkbox" id="customer_all" name="customer_all" value="customer_all" checked>
+                                    Select All
+                                </label><br>
+                                {% for customer in customers %}
+                                <label for="{{ customer.code }}">
+                                    <input type="checkbox" id="id" name="{{ customer.code }}" value="{{ customer.code }}" checked>
+                                    {{ customer.code }} {{ customer.name }}
+                                </label><br>
+                                {% endfor %}
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary>Supplier</summary>
+                            <div id="supplierContainer" class="supplier-container">
+                                <label for="supplier_all">
+                                    <input type="checkbox" id="supplier_all" name="supplier_all" value="supplier_all" checked>
+                                    Select All
+                                </label><br>
+                                {% for supplier in suppliers %}
+                                <label for="{{ supplier.code }}">
+                                    <input type="checkbox" id="id" name="{{ supplier.code }}" value="{{ supplier.code }}" checked>
+                                    {{ supplier.code }} {{ supplier.name }}
+                                </label><br>
+                                {% endfor %}
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary>Driver</summary>
+                            <div id="driverContainer" class="driver-container">
+                                <label for="driver_all">
+                                    <input type="checkbox" id="driver_all" name="driver_all" value="driver_all" checked>
+                                    Select All
+                                </label><br>
+                                {% for driver in drivers %}
+                                <label for="{{ driver.code }}">
+                                    <input type="checkbox" id="id" name="{{ driver.code }}" value="{{ driver.code }}" checked>
+                                    {{ driver.code }} {{ driver.name }}
+                                </label><br>
+                                {% endfor %}
+                            </div>
+                        </details>
+
+                        <details>
+                            <summary>Vehicle</summary>
+                            <div id="vehicleContainer" class="vehicle-container">
+                                <label for="vehicle_all">
+                                    <input type="checkbox" id="vehicle_all" name="vehicle_all" value="vehicle_all" checked>
+                                    Select All
+                                </label><br>
+                                {% for vehicle in vehicles %}
+                                <label for="{{ vehicle.reg_no }}">
+                                    <input type="checkbox" id="id" name="{{ vehicle.reg_no }}" value="{{ vehicle.reg_no }}" checked>
+                                    {{ vehicle.reg_no }} {{ vehicle.model }}
+                                </label><br>
+                                {% endfor %}
+                            </div>
+                        </details>
+                        
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    </td>
+                    <td>
+                        <button type="" id="button">Clear</button>
+                        <button type="button" onclick="Popup()">Print</button>
+                        <button type="button" id="exportButton">Export to Excel</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div>
+        report
+    </div>
+    <div id="tableContainer">
+        <table id="reportTable"></table>
+    </div>
+    
+
+</div>
+
+<script>
+    //table2excel.js    
+;
+(function ($, window, document, undefined) {
+    var pluginName = "table2excel",
+        defaults = {
+            exclude: ".noExl",
+            name: "Table2Excel",
+            filename: "table2excel",
+            fileext: ".xls",
+            exclude_img: true,
+            exclude_links: true,
+            exclude_inputs: true
+        };
+    // The actual plugin constructor    
+    function Plugin(element, options) {
+        this.element = element;
+        // jQuery has an extend method which merges the contents of two or    
+        // more objects, storing the result in the first object. The first object    
+        // is generally empty as we don't want to alter the default options for    
+        // future instances of the plugin    
+        //    
+        this.settings = $.extend({}, defaults, options);
+        this._defaults = defaults;
+        this._name = pluginName;
+        this.init();
+    }
+    Plugin.prototype = {
+        init: function () {
+            var e = this;
+            var utf8Heading = "<meta http-equiv=\"content-type\" content=\"application/vnd.ms-excel; charset=UTF-8\">";
+            e.template = {
+                head: "<html xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:x=\"urn:schemas-microsoft-com:office:excel\" xmlns=\"http://www.w3.org/TR/REC-html40\">" + utf8Heading + "<head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>",
+                sheet: {
+                    head: "<x:ExcelWorksheet><x:Name>",
+                    tail: "</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>"
+                },
+                mid: "</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>",
+                table: {
+                    head: "<table>",
+                    tail: "</table>"
+                },
+                foot: "</body></html>"
+            };
+            e.tableRows = [];
+            // get contents of table except for exclude    
+            $(e.element).each(function (i, o) {
+                var tempRows = "";
+                $(o).find("tr").not(e.settings.exclude).each(function (i, p) {
+                    tempRows += "<tr>";
+                    $(p).find("td,th").not(e.settings.exclude).each(function (i, q) { // p did not exist, I corrected    
+                        var rc = {
+                            rows: $(this).attr("rowspan"),
+                            cols: $(this).attr("colspan"),
+                            flag: $(q).find(e.settings.exclude)
+                        };
+                        if (rc.flag.length > 0) {
+                            tempRows += "<td> </td>"; // exclude it!!    
+                        } else {
+                            if (rc.rows & rc.cols) {
+                                tempRows += "<td>" + $(q).html() + "</td>";
+                            } else {
+                                tempRows += "<td";
+                                if (rc.rows > 0) {
+                                    tempRows += " rowspan=\'" + rc.rows + "\' ";
+                                }
+                                if (rc.cols > 0) {
+                                    tempRows += " colspan=\'" + rc.cols + "\' ";
+                                }
+                                tempRows += "/>" + $(q).html() + "</td>";
+                            }
+                        }
+                    });
+                    tempRows += "</tr>";
+                    //console.log(tempRows);
+                });
+                // exclude img tags    
+                if (e.settings.exclude_img) {
+                    tempRows = exclude_img(tempRows);
+                }
+                // exclude link tags    
+                if (e.settings.exclude_links) {
+                    tempRows = exclude_links(tempRows);
+                }
+                // exclude input tags    
+                if (e.settings.exclude_inputs) {
+                    tempRows = exclude_inputs(tempRows);
+                }
+                e.tableRows.push(tempRows);
+            });
+            e.tableToExcel(e.tableRows, e.settings.name, e.settings.sheetName);
+        },
+        tableToExcel: function (table, name, sheetName) {
+            var e = this,
+                fullTemplate = "",
+                i, link, a;
+            e.format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) {
+                    return c[p];
+                });
+            };
+            sheetName = typeof sheetName === "undefined" ? "Sheet" : sheetName;
+            e.ctx = {
+                worksheet: name || "Worksheet",
+                table: table,
+                sheetName: sheetName
+            };
+            fullTemplate = e.template.head;
+            if ($.isArray(table)) {
+                for (i in table) {
+                    //fullTemplate += e.template.sheet.head + "{worksheet" + i + "}" + e.template.sheet.tail;    
+                    fullTemplate += e.template.sheet.head + sheetName + i + e.template.sheet.tail;
+                }
+            }
+            fullTemplate += e.template.mid;
+
+            if ($.isArray(table)) {
+                for (i in table) {
+                    fullTemplate += e.template.table.head + "{table" + i + "}" + e.template.table.tail;
+                }
+            }
+            fullTemplate += e.template.foot;
+            for (i in table) {
+                e.ctx["table" + i] = table[i];
+            }
+            delete e.ctx.table;
+            var isIE = /*@cc_on!@*/ false || !!document.documentMode; // this works with IE10 and IE11 both :)                
+            //if (typeof msie !== "undefined" && msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // this works ONLY with IE 11!!!    
+            if (isIE) {
+                if (typeof Blob !== "undefined") {
+                    //use blobs if we can    
+                    fullTemplate = e.format(fullTemplate, e.ctx); // with this, works with IE    
+                    fullTemplate = [fullTemplate];
+                    //convert to array    
+                    var blob1 = new Blob(fullTemplate, {
+                        type: "text/html"
+                    });
+                    window.navigator.msSaveBlob(blob1, getFileName(e.settings));
+                } else {
+                    //otherwise use the iframe and save    
+                    //requires a blank iframe on page called txtArea1    
+                    txtArea1.document.open("text/html", "replace");
+                    txtArea1.document.write(e.format(fullTemplate, e.ctx));
+                    txtArea1.document.close();
+                    txtArea1.focus();
+                    sa = txtArea1.document.execCommand("SaveAs", true, getFileName(e.settings));
+                }
+            } else {
+                var blob = new Blob([e.format(fullTemplate, e.ctx)], {
+                    type: "application/vnd.ms-excel"
+                });
+                window.URL = window.URL || window.webkitURL;
+                link = window.URL.createObjectURL(blob);
+                a = document.createElement("a");
+                a.download = getFileName(e.settings);
+                a.href = link;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+            return true;
+        }
+    };
+    function getFileName(settings) {
+        return (settings.filename ? settings.filename : "table2excel");
+    }
+    // Removes all img tags    
+    function exclude_img(string) {
+        var _patt = /(\s+alt\s*=\s*"([^"]*)"|\s+alt\s*=\s*'([^']*)')/i;
+        return string.replace(/<img[^>]*>/gi, function myFunction(x) {
+            var res = _patt.exec(x);
+            if (res !== null && res.length >= 2) {
+                return res[2];
+            } else {
+                return "";
+            }
+        });
+    }
+    // Removes all link tags    
+    function exclude_links(string) {
+        return string.replace(/<a[^>]*>|<\/a>/gi, "");
+    }
+    // Removes input params    
+    function exclude_inputs(string) {
+        var _patt = /(\s+value\s*=\s*"([^"]*)"|\s+value\s*=\s*'([^']*)')/i;
+        return string.replace(/<input[^>]*>|<\/input>/gi, function myFunction(x) {
+            var res = _patt.exec(x);
+            if (res !== null && res.length >= 2) {
+                return res[2];
+            } else {
+                return "";
+            }
+        });
+    }
+    $.fn[pluginName] = function (options) {
+        var e = this;
+        e.each(function () {
+            if (!$.data(e, "plugin_" + pluginName)) {
+                $.data(e, "plugin_" + pluginName, new Plugin(this, options));
+            }
+        });
+        // chain jQuery functions    
+        return e;
+    };
+})(jQuery, window, document); 
+</script>
+
+
+{% endblock %}
+
+{% block script %}
+
+let csrf_token = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+const editProductUrl = "{% url 'edit_product' %}";
+let form = document.querySelector("form");
+let button = document.querySelector("#button");
+let animationInstance = null;
+function formatDate(inputDate) {
+    const date = new Date(inputDate);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// column name Object: to replace the column name to become more desctiptive
+let column_names = {
+    'id': 'id',
+    'date': 'Date',
+    'vehicle__reg_no': 'Vehicle',
+    'vehicle__model': 'Model',
+    'driver__code': 'Driver',
+    'driver__name': 'Driver Name',
+    'supplier__code': 'Supplier',
+    'supplier__name': 'Supplier Name',
+    'customer__code': 'Customer',
+    'customer__name': 'Customer Name',
+    'product__code': 'Product',
+    'product__name': 'Product Name',
+    'ticket_no': 'Ticket no',
+    'do': 'D.O',
+    'weight_in': 'Weight in',
+    'weight_out': 'Weight out',
+    'deduction': 'deduction',
+    'weight_nett': 'Weight nett',
+    'remark': 'Remark',
+    'supplier_qty': 'Supplier Qty',
+    'customer_ticket_no': 'Customer Ticket No',
+    'factory_nett': 'Factory Nett',
+    'bucket': 'Bucket'
+}
+const column_filter = document.querySelector('.column_filter');
+const inputContainer = document.getElementById('inputContainer');
+const labels = inputContainer.querySelectorAll('label');
+
+labels.forEach((label, index) => {
+    label.draggable = true;
+    label.dataset.index = index;
+
+    label.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', label.dataset.index);
+    });
+
+    label.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+
+    label.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const sourceIndex = e.dataTransfer.getData('text/plain');
+        const targetIndex = label.dataset.index;
+
+        if (sourceIndex !== targetIndex) {
+            reorderLabels(Number(sourceIndex), Number(targetIndex));
+        }
+    });
+});
+
+function reorderLabels(sourceIndex, targetIndex) {
+    const targetLabel = labels[targetIndex];
+    const sourceLabel = labels[sourceIndex];
+    const parent = targetLabel.parentNode;
+
+    if (sourceIndex < targetIndex) {
+        parent.insertBefore(targetLabel, sourceLabel);
+    } else {
+        parent.insertBefore(sourceLabel, targetLabel.nextSibling);
+    }
+
+    updateIndexes();
+}
+
+function updateIndexes() {
+    labels.forEach((label, index) => {
+        label.dataset.index = index;
+    });
+}
+
+function getCheckboxOrder() {
+    const order = Array.from(labels)
+        .map(label => label.getAttribute('for'))
+        .filter(checkboxId => checkboxId);
+
+    return order;
+}
+
+
+// get the input value of the input in the inputContainer
+function getInputValue(){
+    let inputContainer = document.getElementById('inputContainer');
+    let input = inputContainer.querySelectorAll('input');
+    let inputObj = [];
+    input.forEach(function(item){
+        inputObj.push(item.value);
+    })
+    return inputObj;
+}
+
+// get the product filter value which is the unchecked checkbox
+function getUncheckedFilter(divId){
+    let div = document.getElementById(divId);
+    let checked = div.querySelectorAll('input[type="checkbox"]:not(:checked)');
+    let checkedObj = [];
+    checked.forEach( item => { checkedObj.push(item.value) });
+    return checkedObj;
+}
+
+
+function getKeyByValue(object, value) {
+    for (const key in object) {
+        if (object.hasOwnProperty(key) && object[key] === value) {
+            return key;
+        }
+    }
+    return null; // Return null if value is not found
+}
+function generateTable(data) {
+    const tableContainer = document.getElementById('tableContainer');
+    let table_ = tableContainer.querySelector('table')
+    //check if table exists
+    if (table_ != null) {
+        table_.remove()
+        //create and append a new table with id reportTable
+        const table = document.createElement('table');
+        table.setAttribute('id', 'reportTable');
+        tableContainer.appendChild(table);
+
+    }
+    
+    //table_.remove()
+    
+    const jsonData = data.report_data; // Paste your JSON data here
+    const parsedData = JSON.parse(jsonData);
+    console.log(parsedData)
+    const table = document.getElementById('reportTable');
+
+    // Create the table header
+    const tableHeader = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    for (const key in parsedData[0]) {
+        const th = document.createElement('th');
+        th.textContent = column_names[key];
+        headerRow.appendChild(th);                
+    }
+    tableHeader.appendChild(headerRow);
+    table.appendChild(tableHeader);
+    
+    // Get the first two column names
+    const groupCodeField = Object.keys(parsedData[0])[0];
+    const groupNameField = Object.keys(parsedData[0])[1];
+
+    // Create the table body
+    let currentGroup = '';
+    const tableBody = document.createElement('tbody');
+    let supplier_qty_total = 0;
+    let deduction_total = 0;
+    let finalTotal = 0;
+    let finalSupplierTotal = 0;
+    let finalDeductionTotal = 0;  
+    let totalNettWeight = 0;
+
+    for (const key in parsedData) {
+        const entry = parsedData[key];
+        if (entry.date !== "NaT") {
+            totalNettWeight += entry.weight_nett || 0;
+        }
+        if (form.group_by.value === '') {
+
+            const row = document.createElement('tr');
+
+            for (const value in parsedData[key]) {
+                const cell = document.createElement('td');
+                cell.textContent = parsedData[key][value];
+
+                if (parsedData[key][value] == 'NaT' || parsedData[key][value] == 'None') {
+                    cell.textContent = '';
+                }
+                if (value == 'supplier_qty'){
+                    finalSupplierTotal += parsedData[key]['supplier_qty'];
+                }
+                if (value == 'deduction'){
+                    finalDeductionTotal += parsedData[key]['deduction'];
+                }
+                if (value == 'weight_nett'){
+                    finalTotal += parsedData[key]['weight_nett'];
+                }
+                row.appendChild(cell);
+
+            }
+
+            tableBody.appendChild(row);
+        }else{
+            const groupCode = parsedData[key][groupCodeField];
+            const groupName = parsedData[key][groupNameField];
+
+            if (currentGroup !== groupCode) {
+                const groupRow = document.createElement('tr');
+
+                for (const groupField of [groupCodeField, groupNameField]) {
+                    let nextIsTotal = false;
+                    const groupCell = document.createElement('td');
+                    groupCell.textContent = parsedData[key][groupField];
+
+                    groupRow.appendChild(groupCell);
+                }
+
+                tableBody.appendChild(groupRow);
+                currentGroup = groupCode;
+            }
+
+            const row = document.createElement('tr');
+            let index_ = 0;
+            
+            for (const value in parsedData[key]) {
+                const cell = document.createElement('td');
+                
+                if (value == 'date' && parsedData[key]['date'] != 'NaT') {
+                    supplier_qty_total += parsedData[key]['supplier_qty'];
+                    deduction_total += parsedData[key]['deduction'];
+                    //console.log(supplier_qty_total)
+                }
+                
+                cell.textContent = parsedData[key][value];
+                if (index_ < 2){
+                    cell.textContent = '';
+                }
+                if (parsedData[key][value] == 'NaT' || parsedData[key][value] == 'None') {
+                    cell.textContent = '';
+                }
+                if (value == 'supplier_qty' && parsedData[key]['date'] == 'NaT'){
+                    //console.log(supplier_qty_total)
+                    // style that row with top and bottom border darker lightgrey
+                    row.style.borderTop = '1px solid #ddd';
+                    row.style.borderBottom = '1px solid #ddd';
+                    // row color loght grey
+                    row.style.backgroundColor = '#f2f2f2';
+                    cell.textContent = supplier_qty_total;
+                    supplier_qty_total = 0; 
+                }
+                if (value == 'deduction' && parsedData[key]['date'] == 'NaT'){
+                    cell.textContent = deduction_total;
+                    deduction_total = 0;
+                }
+                if (value == 'supplier_qty'){
+                    finalSupplierTotal += parsedData[key]['supplier_qty'];
+                }
+                if (value == 'deduction'){
+                    finalDeductionTotal += parsedData[key]['deduction'];
+                }
+                if (value == 'weight_nett'){
+                    finalTotal += parsedData[key]['weight_nett'];
+                }
+                row.appendChild(cell);
+                index_++;
+            }
+
+            tableBody.appendChild(row);
+        }
+    }
+    // add final total row on parsedData[key] == 'weight_nett' tfoot
+     
+
+
+
+    table.appendChild(tableBody);
+
+    {% comment %} // tfoot
+     let totalNettWeight = 0;
+    for (const key in parsedData) {
+        const entry = parsedData[key];
+        if (entry.date !== "NaT") {
+            totalNettWeight += entry.weight_nett || 0;
+        }
+
+    } {% endcomment %}
+    const tableFooter = document.createElement('tfoot');
+    const footerRow = document.createElement('tr');
+    for (const key in parsedData[0]) {
+        const footerCell = document.createElement('td');
+        footerCell.textContent = '';
+        if (key === 'weight_nett') {
+            footerCell.textContent = totalNettWeight;
+        } 
+        if (key === 'remark') {
+            footerCell.textContent = 'Total';
+        }
+        if (key === 'supplier_qty') {
+            footerCell.textContent = finalSupplierTotal;
+        }
+        if (key === 'deduction') {
+            footerCell.textContent = finalDeductionTotal;
+        }
+        footerRow.appendChild(footerCell);
+    } 
+    tableFooter.appendChild(footerRow);
+    table.appendChild(tableFooter);
+    
+
+    tableContainer.appendChild(table);
+    table.classList.add('report-table')
+}
+
+// select and deselect all checkbox
+let product_all = document.getElementById('product_all');
+let customer_all = document.getElementById('customer_all');
+let supplier_all = document.getElementById('supplier_all');
+let driver_all = document.getElementById('driver_all');
+let vehicle_all = document.getElementById('vehicle_all');
+
+// when checked, select all checkbox
+product_all.addEventListener('change', function(e){
+    // check if checked
+    if (e.target.checked){
+        let productContainer = document.getElementById('productContainer');
+        let product = productContainer.querySelectorAll('input');
+        product.forEach(function(item){
+            item.checked = true;
+        })
+    }
+    else{
+        let productContainer = document.getElementById('productContainer');
+        let product = productContainer.querySelectorAll('input');
+        product.forEach(function(item){
+            item.checked = false;
+        })
+    }
+})
+
+customer_all.addEventListener('change', function(e){
+    // check if checked
+    if (e.target.checked){
+        let customerContainer = document.getElementById('customerContainer');
+        let customer = customerContainer.querySelectorAll('input');
+        customer.forEach(function(item){
+            item.checked = true;
+        })
+    }
+    else{
+        let customerContainer = document.getElementById('customerContainer');
+        let customer = customerContainer.querySelectorAll('input');
+        customer.forEach(function(item){
+            item.checked = false;
+        })
+    }
+})
+
+supplier_all.addEventListener('change', function(e){
+    // check if checked
+    if (e.target.checked){
+        let supplierContainer = document.getElementById('supplierContainer');
+        let supplier = supplierContainer.querySelectorAll('input');
+        supplier.forEach(function(item){
+            item.checked = true;
+        })
+    }
+    else{
+        let supplierContainer = document.getElementById('supplierContainer');
+        let supplier = supplierContainer.querySelectorAll('input');
+        supplier.forEach(function(item){
+            item.checked = false;
+        })
+    }
+})
+
+driver_all.addEventListener('change', function(e){
+    // check if checked
+    if (e.target.checked){
+        let driverContainer = document.getElementById('driverContainer');
+        let driver = driverContainer.querySelectorAll('input');
+        driver.forEach(function(item){
+            item.checked = true;
+        })
+    }
+    else{
+        let driverContainer = document.getElementById('driverContainer');
+        let driver = driverContainer.querySelectorAll('input');
+        driver.forEach(function(item){
+            item.checked = false;
+        })
+    }
+})
+
+vehicle_all.addEventListener('change', function(e){
+    // check if checked
+    if (e.target.checked){
+        let vehicleContainer = document.getElementById('vehicleContainer');
+        let vehicle = vehicleContainer.querySelectorAll('input');
+        vehicle.forEach(function(item){
+            item.checked = true;
+        })
+    }
+    else{
+        let vehicleContainer = document.getElementById('vehicleContainer');
+        let vehicle = vehicleContainer.querySelectorAll('input');
+        vehicle.forEach(function(item){
+            item.checked = false;
+        })
+    }
+})
+
+
+
+//on form value changed, sent post request to server
+form.addEventListener("change", (e) => {
+    console.table({
+        start_date: form.start_date.value,
+        end_date: form.end_date.value,
+        group_by: form.group_by.value})
+
+        // get unchecked checkbox in an array
+        let checked = document.querySelectorAll('#inputContainer input[type="checkbox"]:not(:checked)');
+        let checkedObj = [];
+        checked.forEach(function(item){
+            checkedObj.push(item.value);
+        })
+
+        {% comment %} console.log({product_filter: getUncheckedFilter('productContainer'),
+                    customer_filter: getUncheckedFilter('customerContainer'),
+                    supplier_filter: getUncheckedFilter('supplierContainer'),
+                    driver_filter: getUncheckedFilter('driverContainer'),
+                    vehicle_filter: getUncheckedFilter('vehicleContainer')});
+        console.log(checkedObj); {% endcomment %}
+
+        fetch("{% url 'report_data' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'start_date': form.start_date.value,
+                'end_date': form.end_date.value,
+                'group_by': form.group_by.value,
+                'column_filter': checkedObj,
+                'order': getInputValue(),
+                'filter_obj': {
+                    'product': getUncheckedFilter('productContainer'),
+                    'customer': getUncheckedFilter('customerContainer'),
+                    'supplier': getUncheckedFilter('supplierContainer'),
+                    'driver': getUncheckedFilter('driverContainer'),
+                    'vehicle': getUncheckedFilter('vehicleContainer')
+                }
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            
+            generateTable(data);
+        }).catch(function (error) {
+            
+        });
+});
+
+button.addEventListener('click', function(e){
+    e.preventDefault();
+    form.reset();
+})
+
+document.getElementById('inputContainer').addEventListener("drop", (e) => {
+    console.table({
+        start_date: form.start_date.value,
+        end_date: form.end_date.value,
+        group_by: form.group_by.value})
+
+        // get unchecked checkbox in an array
+        let checked = document.querySelectorAll('#inputContainer input[type="checkbox"]:not(:checked)');
+        let checkedObj = [];
+        checked.forEach(function(item){
+            checkedObj.push(item.value);
+        })
+
+        console.log(getInputValue());
+
+        fetch("{% url 'report_data' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'start_date': form.start_date.value,
+                'end_date': form.end_date.value,
+                'group_by': form.group_by.value,
+                'column_filter': checkedObj,
+                'order': getInputValue(),
+                'filter_obj': {
+                    'product': getUncheckedFilter('productContainer'),
+                    'customer': getUncheckedFilter('customerContainer'),
+                    'supplier': getUncheckedFilter('supplierContainer'),
+                    'driver': getUncheckedFilter('driverContainer'),
+                    'vehicle': getUncheckedFilter('vehicleContainer')
+                }
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            generateTable(data);
+        }).catch(function (error) {
+            
+        });
+});
+
+function Popup() {
+    // create tyle element
+    // Create style element
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = `
+    body{width:595px;height:842px;}
+        table { page-break-inside:auto; font-size: 10px; width: 590px; }
+        tr { page-break-inside:auto; }
+        .report-table {border-collapse: collapse; border-spacing: 0; width: 100%;}
+        .report-table th, .report-table td {padding: 0.25em 0.75em;}
+        
+        .report-table thead th {border-bottom: 1px solid #333; text-align: center; font-weight: bold;}
+        .report-table tfoot th, .report-table tfoot td {border-top: 2px solid #666; color: #363;}
+        div {margin: 0; width: 100%;}
+    `;
+
+    var myWindow = window.open('', 'PRINT', 'height=700,width=600');
+    myWindow.document.write('<html><head><title>Report</title><style>');
+    myWindow.document.write(style.innerHTML);
+    myWindow.document.write('</style></head><body>');
+    myWindow.document.write('<div>');
+    myWindow.document.write(document.getElementById('tableContainer').innerHTML);
+    myWindow.document.getElementById('reportTable').classList.add('report-table');
+    myWindow.document.write('</div>');
+    myWindow.document.write('</body></html>');
+    myWindow.document.close();
+    
+
+    myWindow.onload = function () {
+        var scaleFactor = Math.min(
+            myWindow.innerWidth / (595 * 1), // A4 width in pixels
+            myWindow.innerHeight / (842 * 1) // A4 height in pixels
+        );
+
+        // Print the scaleFactor for debugging
+        console.log('Scale Factor:', scaleFactor);
+
+        // Apply scaling to the table and div
+        /* var reportTable = myWindow.document.querySelector('body');
+        reportTable.style.transform = 'scale(0.473872)';
+        reportTable.style.transformOrigin = 'top left'; */
+
+        myWindow.focus();
+        myWindow.print();
+        //myWindow.close();
+    }; 
+
+
+
+}
+
+function export2excel(){
+    //file name = today date + report
+    filename = 'report_' + formatDate(new Date()) + '.xls';
+    var table2excel = new Table2Excel();
+    table2excel.export(document.querySelectorAll("#reportTable"));
+}
+
+$("#exportButton").click(function() {
+    let filename = 'report_' + formatDate(new Date());
+    /* $("#reportTable").table2excel({
+        exclude: ".noExl", // Specify excluded elements or classes
+        name: filename, // Specify the name of the Excel file
+        filename: filename, // Specify the filename without extension
+        fileext: ".xls" // Specify the file extension
+    }); */
+    $("#reportTable").table2excel({  
+        name: "Table2Excel",  
+        filename: filename,  
+        fileext: ".xls"  
+    }); 
+
+});
+
+{% endblock %}
