@@ -8,4 +8,6 @@ urlpatterns = [
     path('add_person/', views.add_person, name='add_person'),
     path('delete_person/', views.delete_person, name='delete_person'),
     path('edit_person/', views.edit_person, name='edit_person'),
+    path('api/', views.PersonView.as_view(), name='api_person'),
+    path('new/', views.new_person_view, name='new_person'),
 ]

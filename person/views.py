@@ -1,9 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .models import Person
 import json
 # Create your views here.
+
+from django.views import View
+from django.db import transaction
+from django.forms.models import model_to_dict
 
 @login_required(login_url='login')
 def customer(request):
@@ -99,3 +103,92 @@ def edit_person(request):
 
             return JsonResponse({'message': 'Success'}, status=200)
     return JsonResponse({'message': 'Method not allowed'}, status=400)
+
+
+def new_person_view(request):
+    return render(request, 'new_person.html')
+
+class PersonView(View):
+    def get(self, request):
+        data = request.GET
+        type = data.get('type', None)
+
+        page = int(data.get('page', 1))
+        limit = int(data.get('limit', 10))
+        start = (page - 1) * limit
+        end = start + limit        
+
+        search = data.get('search', 'false')
+
+        if type is None:
+            return JsonResponse({'message': 'Invalid data!'}, status=400)
+        
+        total_page = Person.objects.filter(type=type).count() // limit + 1
+        if page > total_page:
+            return JsonResponse({'message': 'Page not found!'}, status=404)
+        
+        if search == 'true':
+            search_data = {
+                'name__contains': data.get('name', ''),
+                'code__contains': data.get('code', ''),
+                'phone__contains': data.get('phone', ''),
+                'ic__contains': data.get('ic', ''),
+            }
+
+            persons = Person.objects.filter(type=type, **search_data)[start:end]
+            persons = persons.as_dict()
+            data = {'data': persons, 'total_page': total_page, 'page': page, 'limit': limit,}
+            return JsonResponse(data, status=200)
+        else:
+            persons = Person.objects.filter(type=type)[start:end]
+            persons = persons.as_dict()
+            data = {'data': persons, 'total_page': total_page, 'page': page, 'limit': limit,}
+            return JsonResponse(data, status=200, safe=False)
+    
+    def post(self, request):
+        with transaction.atomic():
+            data: dict = json.loads(request.body)
+
+            if data.get('code', None) == None or data.get('type', None) == None:
+                return JsonResponse({'message': 'Invalid data!'}, status=400)
+
+            person = Person.objects.filter(code=data.get('code'), type=data.get('type')).first()
+            
+            if person:
+                return JsonResponse({'message': 'Person already exists!'}, status=400)
+            else:
+                person = Person(**data)
+                person.save()
+                data['id'] = person.id
+                return JsonResponse(data, status=200)
+            
+    def put(self, request):
+        with transaction.atomic():
+            data: dict = json.loads(request.body)
+
+            if data.get('id', None) == None:
+                return JsonResponse({'message': 'Invalid data!'}, status=400)
+
+            person = Person.objects.filter(id=data.get('id')).first()
+            if person:
+                for key, value in data.items():
+                    setattr(person, key, value)
+                person.save()
+                return JsonResponse(data, status=200)
+            else:
+                return JsonResponse({'message': 'Person does not exist!'}, status=400)
+            
+    def delete(self, request):
+        with transaction.atomic():
+            data: dict = json.loads(request.body)
+
+            if data.get('id', None) == None:
+                return JsonResponse({'message': 'Invalid data!'}, status=400)
+
+            person = Person.objects.filter(id=data.get('id')).first()
+            if person:
+                person.delete()
+                return JsonResponse({'message': 'Success'}, status=200)
+            else:
+                return JsonResponse({'message': 'Person does not exist!'}, status=400)
+        

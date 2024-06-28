@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% block title %}{{ type }}{% endblock title %}
+{% block content %}
+{% include 'shared/_topnav.html' %}
+<div class="parent"> 
+{% include 'shared/_navbar.html' %}
+<div class="div2">
+    <h1>{{ type }}</h1>
+    <div>
+        <form>
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>
+                        <label for="code">Code</label>
+                    </td>
+                    <td>
+                        <input type="text" name="code" placeholder="Code" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="name">Name</label>
+                    </td>
+                    <td>
+                        <input type="text" name="name" placeholder="Name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="phone">Phone</label>
+                    </td>
+                    <td>
+                        <input type="text" name="phone" placeholder="Phone" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="ic">IC</label>
+                    </td>
+                    <td>
+                        <input type="text" name="ic" placeholder="Type" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+
+                    <td>
+                        <button type="submit" id="button">Add</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div>
+        
+    </div>
+    <table class="datatable">
+        <colgroup>
+            <col style="width: 50px;">
+            <col style="width: 250px;">
+            <col style="width: 100px;">
+            <col style="width: 100px;">
+        </colgroup>
+        <thead>
+            <tr>
+                <td hidden>id</td>
+                <td>Code</td>
+                <td>Name</td>
+                <td>Phone</td>
+                <td>IC</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for person in persons  %}
+                <tr>
+                    <td hidden>{{ person.id }}</td>
+                    <td>{{ person.code }}</td>
+                    <td>{{ person.name }}</td>
+                    <td>{{ person.phone }}</td>
+                    <td>{{ person.ic }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+</div>
+
+
+
+{% endblock %}
+
+{% block script %}
+let type = '{{ type }}';
+let csrf_token = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+let form = document.querySelector("form");
+let button = document.querySelector("#button");
+let animationInstance = null;
+
+tbody.addEventListener("dblclick", function (event) {
+    var td = event.target;
+    var row = td.closest("tr");
+
+    if (td.tagName === "TD") {
+        makeRowEditable(row);
+        td.focus();
+        selectText(td);
+        
+        
+        // Remove 'selected-row' class from all other rowsa
+        var allRows = tbody.querySelectorAll("tr");
+        allRows.forEach(function (r) {
+            r.classList.remove("selected-row");
+        });
+
+        // Add 'selected-row' class to the clicked row
+        row.classList.add("selected-row");
+    }
+});
+
+tbody.addEventListener("keydown", function (event) {
+    //delete
+    if (event.keyCode === 46) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+
+        const obj = {};
+        [obj.id, obj.code, obj.name, obj.phone, obj.ic] = rowData;
+
+        console.table(obj);
+        //fetch delete_product
+        //confirm
+        if (!confirm("Are you sure you want to delete this product?")) {
+            return;
+        }
+        fetch("{% url 'delete_person' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'id': obj.id
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            row.remove();
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+    }
+
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        var row = event.target.closest("tr");
+        var rowData = [];
+
+        row.querySelectorAll("td").forEach(function (td) {
+            rowData.push(td.textContent);
+        });
+        
+
+
+        const obj = {};
+        [obj.id, obj.code, obj.name, obj.phone, obj.ic] = rowData;
+        obj.id = parseInt(obj.id);
+
+        console.table(obj);
+        //fetch edit_product
+        fetch("{% url 'edit_person' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf_token
+            },
+            body: JSON.stringify({
+                'id': obj.id,
+                'code': obj.code,
+                'name': obj.name,
+                'phone': obj.phone,
+                'ic': obj.ic,
+                'type': type
+            })
+        }).then(function (response) {
+            //console.log(response);
+            if (!response.ok) {
+                return response.json().then(function (data) {
+                    //alert(data.message); // Display the error message in an alert box
+                    throw new Error("Product already exists");
+                });
+            }
+            return response.json();
+        }).then(function (data) {
+            //console.log(data);
+            row.classList.remove("selected-row");
+            makeRowUnEditable(row);
+        }).catch(function (error) {
+            //console.log(error.errorThrown, error.textStatus, error.jqXHR);
+        });
+
+       
+    }
+});
+
+
+
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    animationInstance = new ASCIIAnimation(button_loading, 50, button);
+
+    // Get the values from the form
+    let code = form.code.value;
+    let name = form.name.value;
+    let phone = form.phone.value;
+    let ic = form.ic.value;
+
+    console.table({code, name, phone, ic});
+
+    //if input is empty
+    if (code === "" || name === "") {
+        alert("Please fill out all fields");
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        return;
+    }
+
+    //post using fetch api
+    fetch("{% url 'add_person' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf_token
+        },
+        body: JSON.stringify({
+            'code': code,
+            'name': name,
+            'phone': phone,
+            'ic': ic,
+            'type': type
+        })
+    }).then(function (response) {
+        if (!response.ok) {
+            return response.json().then(function (data) {
+                //alert(data.message); // Display the error message in an alert box
+                throw new Error("Product already exists");
+            });
+        }
+        return response.json();
+    }).then(function (data) {
+        // Create a new row
+        let row = document.createElement("tr");
+    
+        // Create the cells
+        let idCell = document.createElement("td"); 
+        let codeCell = document.createElement("td");
+        let nameCell = document.createElement("td");
+        let phoneCell = document.createElement("td");
+        let icCell = document.createElement("td");
+    
+        // Set the values of the cells
+        idCell.textContent = data.new_id;
+        codeCell.textContent = code;
+        nameCell.textContent = name;
+        phoneCell.textContent = phone;
+        icCell.textContent = ic;
+
+        idCell.hidden = true;
+    
+        // Add the cells to the row
+        row.appendChild(idCell);
+        row.appendChild(codeCell);
+        row.appendChild(nameCell);
+        row.appendChild(phoneCell);
+        row.appendChild(icCell);
+
+        tbody.appendChild(row);
+
+        console.log(data);
+
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+    }).catch(function (error) {
+        animationInstance.stopAnimation();
+        button.innerHTML = "Add";
+        alert(error.message.toString());    
+    })
+
+    // Clear the form
+    form.reset();
+});
+
+{% endblock %}
